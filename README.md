@@ -24,6 +24,70 @@ dotnet tool install --global BBDown
 dotnet tool update --global BBDown
 ```
 
+## 从源码运行
+
+本项目基于 .NET 9，先安装 [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)，并准备好 `ffmpeg` 或 `mp4box` 用于混流。
+
+```bash
+git clone https://github.com/Conanxy/BBDown.git
+cd BBDown
+dotnet restore
+dotnet build
+```
+
+运行命令行版本：
+
+```bash
+dotnet run --project BBDown -- "<视频地址或 BV/AV/EP/SS>"
+```
+
+仅解析信息、不下载：
+
+```bash
+dotnet run --project BBDown -- "<视频地址或 BV/AV/EP/SS>" --only-show-info
+```
+
+运行 GUI 预览版：
+
+```bash
+dotnet run --project BBDown.GUI
+```
+
+以服务器模式运行：
+
+```bash
+dotnet run --project BBDown -- serve -l "http://0.0.0.0:23333"
+```
+
+使用 Docker 运行服务器模式：
+
+```bash
+docker build -t bbdown .
+docker run --rm -p 23333:23333 bbdown
+```
+
+发布 GUI 安装包：
+
+```bash
+git tag gui-v1.6.3
+git push origin gui-v1.6.3
+```
+
+推送 `gui-v*` 标签后，GitHub Actions 会自动创建一个 prerelease，并上传 `macOS x64/arm64 .dmg` 与 `Windows x64/x86 .exe` 安装包。
+
+## GUI（预览）
+仓库内新增了跨平台桌面项目 `BBDown.GUI`，使用 `Avalonia`，可在 macOS 和 Windows 上运行。
+
+当前 GUI 覆盖范围：
+- 提交下载任务
+- 配置常用下载参数（工作目录、解析模式、分P、编码/画质优先级、常见开关）
+- 查看运行中/已完成任务、进度、落盘路径与失败原因
+
+当前未覆盖：
+- 登录二维码流程
+- 命令行交互式选轨
+- 全量命令行参数
+
 # 下载
 Release版本：https://github.com/nilaoda/BBDown/releases
 

@@ -1,0 +1,557 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:BBDown.GUI.ViewModels"
+        x:Class="BBDown.GUI.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1360"
+        Height="860"
+        MinWidth="1180"
+        MinHeight="760"
+        Title="BBDown Desktop"
+        Background="{StaticResource AppBgBrush}">
+  <Grid RowDefinitions="Auto,*">
+    <Border Grid.Row="0"
+            Margin="26,26,26,18"
+            Padding="30"
+            CornerRadius="30">
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+          <GradientStop Color="#1C2D35" Offset="0" />
+          <GradientStop Color="#156B63" Offset="0.55" />
+          <GradientStop Color="#3AAE98" Offset="1" />
+        </LinearGradientBrush>
+      </Border.Background>
+      <Grid ColumnDefinitions="*,360" ColumnSpacing="20">
+        <StackPanel Spacing="12">
+          <Border HorizontalAlignment="Left"
+                  Padding="12,6"
+                  CornerRadius="999"
+                  Background="#26FFFFFF">
+            <TextBlock Text="BBDown × Desktop"
+                       Foreground="#E6FFF8"
+                       FontSize="12"
+                       FontWeight="SemiBold" />
+          </Border>
+          <TextBlock Text="下载流程保持原样，桌面体验换一层更顺手的壳。"
+                     FontSize="31"
+                     FontWeight="SemiBold"
+                     Foreground="White"
+                     TextWrapping="Wrap" />
+          <TextBlock Text="现在可以直接选输出目录、提交任务、查看进度，并在完成后跳到 Finder 或资源管理器。"
+                     MaxWidth="760"
+                     FontSize="14"
+                     Foreground="#D6FFF4"
+                     TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Border Grid.Column="1"
+                Padding="22"
+                CornerRadius="24"
+                Background="#22FFFFFF">
+          <StackPanel Spacing="10">
+            <TextBlock Text="{Binding BackendState}"
+                       FontSize="22"
+                       FontWeight="SemiBold"
+                       Foreground="White" />
+            <TextBlock Text="{Binding StatusMessage}"
+                       FontSize="13"
+                       Foreground="#E5FFF9"
+                       TextWrapping="Wrap" />
+            <Border Margin="0,8,0,0"
+                    Padding="14"
+                    CornerRadius="18"
+                    Background="#16FFFFFF">
+              <Grid ColumnDefinitions="*,*">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="运行中"
+                             Foreground="#D8FFF7"
+                             FontSize="12" />
+                  <TextBlock Text="{Binding RunningCount}"
+                             Foreground="White"
+                             FontSize="26"
+                             FontWeight="SemiBold" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="2">
+                  <TextBlock Text="已完成"
+                             Foreground="#D8FFF7"
+                             FontSize="12" />
+                  <TextBlock Text="{Binding FinishedCount}"
+                             Foreground="White"
+                             FontSize="26"
+                             FontWeight="SemiBold" />
+                </StackPanel>
+              </Grid>
+            </Border>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1"
+          Margin="26,0,26,26"
+          ColumnDefinitions="430,*"
+          ColumnSpacing="22">
+      <ScrollViewer Grid.Column="0"
+                    HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="18">
+          <Border Padding="24"
+                  Background="{StaticResource SurfaceBrush}"
+                  BorderBrush="{StaticResource LineBrush}"
+                  BorderThickness="1"
+                  CornerRadius="28">
+            <StackPanel Spacing="18">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="新建任务"
+                             FontSize="24"
+                             FontWeight="SemiBold"
+                             Foreground="{StaticResource TextPrimaryBrush}" />
+                  <TextBlock Text="把常用项放在前面，先能快速下，再决定是否展开高级参数。"
+                             FontSize="13"
+                             Foreground="{StaticResource TextMutedBrush}"
+                             TextWrapping="Wrap" />
+                </StackPanel>
+                <Border Grid.Column="1"
+                        Padding="12,7"
+                        MinWidth="78"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        CornerRadius="999"
+                        Background="#E9F6F1">
+                  <TextBlock Text="{Binding SelectedApiMode}"
+                             HorizontalAlignment="Center"
+                             Foreground="{StaticResource AccentBrush}"
+                             FontWeight="SemiBold" />
+                </Border>
+              </Grid>
+
+              <StackPanel Spacing="8">
+                <TextBlock Text="视频地址"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           FontWeight="SemiBold" />
+                <TextBox Text="{Binding Url}"
+                         Height="48"
+                         Padding="14,10"
+                         FontSize="15"
+                         Background="{StaticResource SurfaceAltBrush}"
+                         BorderBrush="{StaticResource LineBrush}"
+                         PlaceholderText="BV号、AV号、EP地址或完整链接" />
+              </StackPanel>
+
+              <Border Padding="18"
+                      Background="{StaticResource SurfaceAltBrush}"
+                      BorderBrush="{StaticResource LineBrush}"
+                      BorderThickness="1"
+                      CornerRadius="22">
+                <StackPanel Spacing="12">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <StackPanel Spacing="4">
+                      <TextBlock Text="输出目录"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 FontWeight="SemiBold" />
+                      <TextBlock Text="不再手输路径，直接调用系统文件夹选择器。"
+                                 FontSize="12"
+                                 Foreground="{StaticResource TextMutedBrush}" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Height="40"
+                            Width="104"
+                            Padding="16,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            CornerRadius="14"
+                            Background="{StaticResource PrimaryButtonSoftBrush}"
+                            Foreground="{StaticResource PrimaryButtonBrush}"
+                            Click="OnSelectOutputFolder">
+                      选择目录
+                    </Button>
+                  </Grid>
+
+                  <Border Padding="14"
+                          CornerRadius="16"
+                          Background="White"
+                          BorderBrush="{StaticResource LineBrush}"
+                          BorderThickness="1">
+                    <TextBlock Text="{Binding WorkDirDisplay}"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               TextWrapping="Wrap" />
+                  </Border>
+                </StackPanel>
+              </Border>
+
+              <Grid ColumnDefinitions="1.2*,0.8*" ColumnSpacing="14">
+                <Border Padding="18"
+                        Background="{StaticResource SurfaceAltBrush}"
+                        BorderBrush="{StaticResource LineBrush}"
+                        BorderThickness="1"
+                        CornerRadius="22">
+                  <StackPanel Spacing="10">
+                    <TextBlock Text="解析模式"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               FontWeight="SemiBold" />
+                    <ComboBox ItemsSource="{Binding ApiModes}"
+                              SelectedItem="{Binding SelectedApiMode}"
+                              Height="42"
+                              Width="116"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Top" />
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1"
+                        Padding="18"
+                        Background="{StaticResource SurfaceAltBrush}"
+                        BorderBrush="{StaticResource LineBrush}"
+                        BorderThickness="1"
+                        CornerRadius="22">
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="刷新"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               FontWeight="SemiBold" />
+                    <Button Height="42"
+                            Width="116"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            CornerRadius="14"
+                            Background="{StaticResource PrimaryButtonSoftBrush}"
+                            Foreground="{StaticResource PrimaryButtonBrush}"
+                            Command="{Binding RefreshCommand}">
+                      同步列表
+                    </Button>
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <Border Padding="18"
+                      Background="#F3FAF7"
+                      BorderBrush="{StaticResource LineBrush}"
+                      BorderThickness="1"
+                      CornerRadius="22">
+                <StackPanel Spacing="12">
+                  <TextBlock Text="常用开关"
+                             Foreground="{StaticResource TextPrimaryBrush}"
+                             FontWeight="SemiBold" />
+                  <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="10">
+                    <CheckBox Grid.Row="0" Grid.Column="0" Content="仅视频" IsChecked="{Binding VideoOnly}" />
+                    <CheckBox Grid.Row="0" Grid.Column="1" Content="仅音频" IsChecked="{Binding AudioOnly}" />
+                    <CheckBox Grid.Row="1" Grid.Column="0" Content="下载弹幕" IsChecked="{Binding DownloadDanmaku}" />
+                    <CheckBox Grid.Row="1" Grid.Column="1" Content="跳过字幕" IsChecked="{Binding SkipSubtitle}" />
+                    <CheckBox Grid.Row="2" Grid.Column="0" Content="跳过封面" IsChecked="{Binding SkipCover}" />
+                    <CheckBox Grid.Row="2" Grid.Column="1" Content="跳过混流" IsChecked="{Binding SkipMux}" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <Button Height="50"
+                      CornerRadius="16"
+                      HorizontalContentAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      Background="{StaticResource PrimaryButtonBrush}"
+                      Foreground="White"
+                      FontSize="16"
+                      FontWeight="SemiBold"
+                      Command="{Binding SubmitTaskCommand}">
+                加入下载队列
+              </Button>
+            </StackPanel>
+          </Border>
+
+          <Border Padding="24"
+                  Background="{StaticResource SurfaceBrush}"
+                  BorderBrush="{StaticResource LineBrush}"
+                  BorderThickness="1"
+                  CornerRadius="28">
+            <Expander Header="高级参数">
+              <StackPanel Margin="0,18,0,0" Spacing="14">
+                <TextBlock Text="这里保留兼容现有命令行能力的入口，常规使用通常不需要每次展开。"
+                           FontSize="12"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           TextWrapping="Wrap" />
+
+                <TextBox Text="{Binding SelectPage}" Height="42" PlaceholderText="分P选择，例如 1,3-5,LAST" />
+                <TextBox Text="{Binding EncodingPriority}" Height="42" PlaceholderText="编码优先级，例如 hevc,av1,avc" />
+                <TextBox Text="{Binding DfnPriority}" Height="42" PlaceholderText="画质优先级，例如 8K 超高清,1080P 高码率" />
+                <TextBox Text="{Binding Cookie}" Height="42" PlaceholderText="Cookie" />
+                <TextBox Text="{Binding AccessToken}" Height="42" PlaceholderText="Access Token" />
+                <TextBox Text="{Binding FFmpegPath}" Height="42" PlaceholderText="FFmpeg 路径" />
+                <TextBox Text="{Binding Mp4boxPath}" Height="42" PlaceholderText="MP4Box 路径" />
+                <TextBox Text="{Binding Aria2cPath}" Height="42" PlaceholderText="aria2c 路径" />
+                <TextBox Text="{Binding Aria2cArgs}" Height="42" PlaceholderText="aria2c 附加参数" />
+
+                <Border Padding="16"
+                        Background="{StaticResource SurfaceAltBrush}"
+                        BorderBrush="{StaticResource LineBrush}"
+                        BorderThickness="1"
+                        CornerRadius="18">
+                  <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="10">
+                    <CheckBox Grid.Row="0" Grid.Column="0" Content="使用 MP4Box" IsChecked="{Binding UseMP4box}" />
+                    <CheckBox Grid.Row="0" Grid.Column="1" Content="使用 aria2c" IsChecked="{Binding UseAria2c}" />
+                    <CheckBox Grid.Row="1" Grid.Column="0" Content="多线程下载" IsChecked="{Binding MultiThread}" />
+                    <CheckBox Grid.Row="1" Grid.Column="1" Content="输出调试日志" IsChecked="{Binding Debug}" />
+                    <CheckBox Grid.Row="2" Grid.Column="0" Content="强制 HTTP" IsChecked="{Binding ForceHttp}" />
+                    <CheckBox Grid.Row="2" Grid.Column="1" Content="跳过 AI 字幕" IsChecked="{Binding SkipAi}" />
+                    <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="强制替换下载 Host" IsChecked="{Binding ForceReplaceHost}" />
+                  </Grid>
+                </Border>
+              </StackPanel>
+            </Expander>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+
+      <Grid Grid.Column="1" RowDefinitions="Auto,*" RowSpacing="18">
+        <Grid Grid.Row="0" ColumnDefinitions="1.05*,1.05*,*" ColumnSpacing="14">
+          <Border Padding="20"
+                  Background="{StaticResource SurfaceBrush}"
+                  BorderBrush="{StaticResource LineBrush}"
+                  BorderThickness="1"
+                  CornerRadius="24">
+            <StackPanel Spacing="4">
+              <TextBlock Text="运行中"
+                         Foreground="{StaticResource TextMutedBrush}"
+                         FontSize="13" />
+              <TextBlock Text="{Binding RunningCount}"
+                         Foreground="{StaticResource TextPrimaryBrush}"
+                         FontSize="34"
+                         FontWeight="SemiBold" />
+              <TextBlock Text="正在处理的任务会每 2 秒自动刷新一次。"
+                         Foreground="{StaticResource TextMutedBrush}"
+                         FontSize="12"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+
+          <Border Grid.Column="1"
+                  Padding="20"
+                  Background="{StaticResource SurfaceBrush}"
+                  BorderBrush="{StaticResource LineBrush}"
+                  BorderThickness="1"
+                  CornerRadius="24">
+            <StackPanel Spacing="4">
+              <TextBlock Text="已完成"
+                         Foreground="{StaticResource TextMutedBrush}"
+                         FontSize="13" />
+              <TextBlock Text="{Binding FinishedCount}"
+                         Foreground="{StaticResource TextPrimaryBrush}"
+                         FontSize="34"
+                         FontWeight="SemiBold" />
+              <TextBlock Text="下载成功和失败的任务都会保留在这里。"
+                         Foreground="{StaticResource TextMutedBrush}"
+                         FontSize="12"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+
+          <Border Grid.Column="2"
+                  Padding="20"
+                  Background="#EFF6FF"
+                  BorderBrush="#D4E2FF"
+                  BorderThickness="1"
+                  CornerRadius="24">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="任务面板"
+                           Foreground="#4D6AA2"
+                           FontSize="13" />
+                <TextBlock Text="完成任务可以直接打开所在目录。"
+                           Foreground="#22406F"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           TextWrapping="Wrap" />
+              </StackPanel>
+              <Button Grid.Column="1"
+                      Width="112"
+                      Height="42"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      HorizontalContentAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      CornerRadius="14"
+                      Background="{StaticResource PrimaryButtonBrush}"
+                      Foreground="White"
+                      Command="{Binding RefreshCommand}">
+                刷新列表
+              </Button>
+            </Grid>
+          </Border>
+        </Grid>
+
+        <Border Grid.Row="1"
+                Padding="18"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource LineBrush}"
+                BorderThickness="1"
+                CornerRadius="28">
+          <TabControl>
+            <TabItem Header="运行中">
+              <Grid Margin="8">
+                <TextBlock Text="当前没有运行中的任务。"
+                           IsVisible="{Binding NoRunningTasks}"
+                           Foreground="{StaticResource TextMutedBrush}" />
+                <ScrollViewer>
+                  <ItemsControl ItemsSource="{Binding RunningTasks}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate DataType="vm:DownloadTaskItemViewModel">
+                        <Border Margin="0,0,0,14"
+                                Padding="20"
+                                Background="{StaticResource SurfaceAltBrush}"
+                                BorderBrush="{StaticResource LineBrush}"
+                                BorderThickness="1"
+                                CornerRadius="22">
+                          <StackPanel Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="14">
+                              <StackPanel Spacing="5">
+                                <TextBlock Text="{Binding Title}"
+                                           FontSize="19"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimaryBrush}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding Url}"
+                                           FontSize="12"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           TextWrapping="Wrap" />
+                              </StackPanel>
+                              <Border Grid.Column="1"
+                                      Padding="12,6"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Top"
+                                      CornerRadius="999"
+                                      Background="#E7F0FF">
+                                <TextBlock Text="{Binding StatusText}"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1E63D8" />
+                              </Border>
+                            </Grid>
+
+                            <ProgressBar Value="{Binding ProgressPercent}" Maximum="100" Height="9" />
+                            <TextBlock Text="{Binding DetailText}"
+                                       FontSize="12"
+                                       Foreground="#50645D"
+                                       TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding ErrorMessage}"
+                                       IsVisible="{Binding HasError}"
+                                       FontSize="12"
+                                       Foreground="{StaticResource DangerBrush}"
+                                       TextWrapping="Wrap" />
+                            <Border Padding="12"
+                                    IsVisible="{Binding HasSavePaths}"
+                                    Background="White"
+                                    BorderBrush="{StaticResource LineBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="16">
+                              <TextBlock Text="{Binding SavePathsText}"
+                                         FontSize="12"
+                                         Foreground="{StaticResource AccentBrush}"
+                                         TextWrapping="Wrap" />
+                            </Border>
+                            <Button Content="{Binding OpenLocationText}"
+                                    IsVisible="{Binding HasSavePaths}"
+                                    HorizontalAlignment="Left"
+                                    Height="40"
+                                    Padding="16,0"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    CornerRadius="14"
+                                    Background="{StaticResource AccentSoftBrush}"
+                                    Foreground="{StaticResource AccentBrush}"
+                                    Command="{Binding OpenSavedPathCommand}" />
+                          </StackPanel>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Grid>
+            </TabItem>
+
+            <TabItem Header="已完成">
+              <Grid Margin="8">
+                <TextBlock Text="当前没有已完成任务。"
+                           IsVisible="{Binding NoFinishedTasks}"
+                           Foreground="{StaticResource TextMutedBrush}" />
+                <ScrollViewer>
+                  <ItemsControl ItemsSource="{Binding FinishedTasks}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate DataType="vm:DownloadTaskItemViewModel">
+                        <Border Margin="0,0,0,14"
+                                Padding="20"
+                                Background="{StaticResource SurfaceAltBrush}"
+                                BorderBrush="{StaticResource LineBrush}"
+                                BorderThickness="1"
+                                CornerRadius="22">
+                          <StackPanel Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="14">
+                              <StackPanel Spacing="5">
+                                <TextBlock Text="{Binding Title}"
+                                           FontSize="19"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimaryBrush}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding Url}"
+                                           FontSize="12"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           TextWrapping="Wrap" />
+                              </StackPanel>
+                              <Border Grid.Column="1"
+                                      Padding="12,6"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Top"
+                                      CornerRadius="999"
+                                      Background="{StaticResource SuccessSoftBrush}">
+                                <TextBlock Text="{Binding StatusText}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource SuccessBrush}" />
+                              </Border>
+                            </Grid>
+
+                            <ProgressBar Value="{Binding ProgressPercent}" Maximum="100" Height="9" />
+                            <TextBlock Text="{Binding DetailText}"
+                                       FontSize="12"
+                                       Foreground="#50645D"
+                                       TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding ErrorMessage}"
+                                       IsVisible="{Binding HasError}"
+                                       FontSize="12"
+                                       Foreground="{StaticResource DangerBrush}"
+                                       TextWrapping="Wrap" />
+                            <Border Padding="12"
+                                    IsVisible="{Binding HasSavePaths}"
+                                    Background="White"
+                                    BorderBrush="{StaticResource LineBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="16">
+                              <TextBlock Text="{Binding SavePathsText}"
+                                         FontSize="12"
+                                         Foreground="{StaticResource AccentBrush}"
+                                         TextWrapping="Wrap" />
+                            </Border>
+                            <Button Content="{Binding OpenLocationText}"
+                                    IsVisible="{Binding HasSavePaths}"
+                                    HorizontalAlignment="Left"
+                                    Height="40"
+                                    Padding="16,0"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    CornerRadius="14"
+                                    Background="{StaticResource AccentSoftBrush}"
+                                    Foreground="{StaticResource AccentBrush}"
+                                    Command="{Binding OpenSavedPathCommand}" />
+                          </StackPanel>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Grid>
+            </TabItem>
+          </TabControl>
+        </Border>
+      </Grid>
+    </Grid>
+  </Grid>
+</Window>

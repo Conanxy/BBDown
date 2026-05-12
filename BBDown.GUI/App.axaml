@@ -1,0 +1,27 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="BBDown.GUI.App"
+             RequestedThemeVariant="Default">
+  <Application.Resources>
+    <SolidColorBrush x:Key="AppBgBrush" Color="#F3F7F4" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#FCFDFC" />
+    <SolidColorBrush x:Key="SurfaceAltBrush" Color="#F7FBF8" />
+    <SolidColorBrush x:Key="LineBrush" Color="#D9E6E0" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#15251F" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#64756E" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#0F8E73" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#DDF6EE" />
+    <SolidColorBrush x:Key="PrimaryButtonBrush" Color="#1859C8" />
+    <SolidColorBrush x:Key="PrimaryButtonSoftBrush" Color="#E6EEFF" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="#1F8A62" />
+    <SolidColorBrush x:Key="SuccessSoftBrush" Color="#E9F7F0" />
+    <SolidColorBrush x:Key="DangerBrush" Color="#C8415C" />
+    <SolidColorBrush x:Key="DangerSoftBrush" Color="#FCE9EE" />
+  </Application.Resources>
+  <Application.Styles>
+    <FluentTheme />
+    <Style Selector=":is(Button)">
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+  </Application.Styles>
+</Application>

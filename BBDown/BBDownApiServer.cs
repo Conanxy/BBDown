@@ -21,6 +21,7 @@ public class BBDownApiServer
     private WebApplication? app;
     private readonly List<DownloadTask> runningTasks = [];
     private readonly List<DownloadTask> finishedTasks = [];
+    private bool started = false;
 
     public void SetUpServer()
     {
@@ -96,20 +97,26 @@ public class BBDownApiServer
     public void Run(string url)
     {
         if (app is null) return;
-        bool result = Uri.TryCreate(url, UriKind.Absolute, out Uri? uriResult)
-            && uriResult.Scheme == Uri.UriSchemeHttp;
-        if (!result)
-        {
-            Console.BackgroundColor = ConsoleColor.Red;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"{url}不是合法的http URL，url示例：http://0.0.0.0:5000");
-            Console.WriteLine("如果您需要https，请额外配置反向代理");
-            Console.ResetColor();
-            Console.WriteLine();
-            Thread.Sleep(1);
-            Environment.Exit(1);
-        }
+        ValidateListenUrl(url);
         app.Run(url);
+    }
+
+    public async Task StartAsync(string url, CancellationToken cancellationToken = default)
+    {
+        if (app is null) return;
+        if (started) return;
+        ValidateListenUrl(url);
+        app.Urls.Clear();
+        app.Urls.Add(url);
+        await app.StartAsync(cancellationToken);
+        started = true;
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken = default)
+    {
+        if (app is null || !started) return;
+        await app.StopAsync(cancellationToken);
+        started = false;
     }
 
     private async Task<DownloadTask> AddDownloadTaskAsync(MyOption option)
@@ -135,11 +142,11 @@ public class BBDownApiServer
         }
         catch (Exception e)
         {
+            task.ErrorMessage = Config.DEBUG_LOG ? e.ToString() : e.Message;
             Console.BackgroundColor = ConsoleColor.Red;
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($"{aid}下载失败");
-            var msg = Config.DEBUG_LOG ? e.ToString() : e.Message;
-            Console.Write($"{msg}{Environment.NewLine}请尝试升级到最新版本后重试!");
+            Console.Write($"{task.ErrorMessage}{Environment.NewLine}请尝试升级到最新版本后重试!");
             Console.ResetColor();
             Console.WriteLine();
         }
@@ -152,6 +159,22 @@ public class BBDownApiServer
         runningTasks.Remove(task);
         finishedTasks.Add(task);
         return task;
+    }
+
+    private static void ValidateListenUrl(string url)
+    {
+        bool result = Uri.TryCreate(url, UriKind.Absolute, out Uri? uriResult)
+            && uriResult.Scheme == Uri.UriSchemeHttp;
+        if (result) return;
+
+        Console.BackgroundColor = ConsoleColor.Red;
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine($"{url}不是合法的http URL，url示例：http://0.0.0.0:5000");
+        Console.WriteLine("如果您需要https，请额外配置反向代理");
+        Console.ResetColor();
+        Console.WriteLine();
+        Thread.Sleep(1);
+        Environment.Exit(1);
     }
 }
 
@@ -173,6 +196,8 @@ public record DownloadTask(string Aid, string Url, long TaskCreateTime)
     public double TotalDownloadedBytes = 0f;
     [JsonInclude]
     public bool IsSuccessful = false;
+    [JsonInclude]
+    public string? ErrorMessage = null;
 
     [JsonInclude]
     public List<string> SavePaths = new();

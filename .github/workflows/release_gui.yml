@@ -1,0 +1,188 @@
+name: Release GUI
+
+on:
+  push:
+    tags:
+      - "gui-v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag, for example gui-v1.6.3"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_SDK_VERSION: "9.0.x"
+  GUI_PROJECT: BBDown.GUI/BBDown.GUI.csproj
+  APP_NAME: BBDown.GUI
+
+jobs:
+  build-macos:
+    name: Build macOS ${{ matrix.rid }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: osx-x64
+            dmg_arch: x64
+          - rid: osx-arm64
+            dmg_arch: arm64
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+
+      - name: Publish GUI
+        run: |
+          dotnet publish "$GUI_PROJECT" \
+            -c Release \
+            -r "${{ matrix.rid }}" \
+            --self-contained true \
+            -p:PublishSingleFile=false \
+            -p:DebugType=none \
+            -p:DebugSymbols=false \
+            -o "publish/${{ matrix.rid }}"
+
+      - name: Create app bundle
+        run: |
+          set -euo pipefail
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          VERSION="${TAG#gui-v}"
+          APP_DIR="dist/${APP_NAME}.app"
+          mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
+          cp -R "publish/${{ matrix.rid }}/." "$APP_DIR/Contents/MacOS/"
+          chmod +x "$APP_DIR/Contents/MacOS/${APP_NAME}"
+          cat > "$APP_DIR/Contents/Info.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleExecutable</key>
+            <string>${APP_NAME}</string>
+            <key>CFBundleIdentifier</key>
+            <string>io.github.conanxy.bbdown.gui</string>
+            <key>CFBundleName</key>
+            <string>BBDown GUI</string>
+            <key>CFBundleDisplayName</key>
+            <string>BBDown GUI</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleShortVersionString</key>
+            <string>${VERSION}</string>
+            <key>CFBundleVersion</key>
+            <string>${GITHUB_RUN_NUMBER}</string>
+            <key>LSMinimumSystemVersion</key>
+            <string>10.15</string>
+            <key>NSHighResolutionCapable</key>
+            <true/>
+          </dict>
+          </plist>
+          PLIST
+
+      - name: Create DMG
+        run: |
+          set -euo pipefail
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          DMG_NAME="BBDown.GUI_${TAG}_macos-${{ matrix.dmg_arch }}.dmg"
+          mkdir -p dmg-root
+          cp -R "dist/${APP_NAME}.app" dmg-root/
+          ln -s /Applications dmg-root/Applications
+          hdiutil create \
+            -volname "BBDown GUI" \
+            -srcfolder dmg-root \
+            -ov \
+            -format UDZO \
+            "$DMG_NAME"
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BBDown.GUI_macos-${{ matrix.dmg_arch }}
+          path: BBDown.GUI_*_macos-${{ matrix.dmg_arch }}.dmg
+
+  build-windows:
+    name: Build Windows ${{ matrix.rid }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            arch: x64
+          - rid: win-x86
+            arch: x86
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress --yes
+
+      - name: Publish GUI
+        shell: pwsh
+        run: |
+          dotnet publish "$env:GUI_PROJECT" `
+            -c Release `
+            -r "${{ matrix.rid }}" `
+            --self-contained true `
+            -p:PublishSingleFile=false `
+            -p:DebugType=none `
+            -p:DebugSymbols=false `
+            -o "publish/${{ matrix.rid }}"
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $tag = "${{ github.event.inputs.tag || github.ref_name }}"
+          $version = $tag -replace '^gui-v',''
+          iscc packaging/windows/BBDown.GUI.iss `
+            /DAppVersion="$version" `
+            /DSourceDir="$PWD\publish\${{ matrix.rid }}" `
+            /DOutputBaseFilename="BBDown.GUI_${tag}_windows-${{ matrix.arch }}_setup"
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BBDown.GUI_windows-${{ matrix.arch }}
+          path: installer/BBDown.GUI_*_windows-${{ matrix.arch }}_setup.exe
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - build-macos
+      - build-windows
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create or update release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: BBDown GUI ${{ github.event.inputs.tag || github.ref_name }}
+          body: |
+            BBDown GUI preview build.
+
+            Assets:
+            - macOS x64 DMG
+            - macOS arm64 DMG
+            - Windows x64 installer
+            - Windows x86 installer
+          files: release-assets/*
+          draft: false
+          prerelease: true
