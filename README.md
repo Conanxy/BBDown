@@ -3,7 +3,10 @@
 > 本项目仅供个人学习、研究和非商业性用途。用户在使用本工具时，需自行确保遵守相关法律法规，特别是与版权相关的法律条款。开发者不对因使用本工具而产生的任何版权纠纷或法律责任承担责任。请用户在使用时谨慎，确保其行为合法合规，并仅在有合法授权的情况下使用相关内容。
 
 # BBDown
+
 一个命令行式哔哩哔哩下载器. Bilibili Downloader.
+
+本仓库基于 [nilaoda/BBDown](https://github.com/nilaoda/BBDown) 改造，主要目标是在保留原命令行能力的基础上，补充跨平台 GUI 桌面客户端与对应的 macOS / Windows 安装包发布流程。
 
 # 注意
 本软件混流时需要外部程序：
@@ -76,7 +79,7 @@ git push origin gui-v1.6.3
 推送 `gui-v*` 标签后，GitHub Actions 会自动创建一个 prerelease，并上传 `macOS x64/arm64 .dmg` 与 `Windows x64/x86 .exe` 安装包。
 
 ## GUI（预览）
-仓库内新增了跨平台桌面项目 `BBDown.GUI`，使用 `Avalonia`，可在 macOS 和 Windows 上运行。
+本仓库专门新增了跨平台桌面项目 `BBDown.GUI`，使用 `Avalonia`，可在 macOS 和 Windows 上运行；原始命令行项目来源为 [nilaoda/BBDown](https://github.com/nilaoda/BBDown)。
 
 当前 GUI 覆盖范围：
 - 提交下载任务
@@ -89,7 +92,9 @@ git push origin gui-v1.6.3
 - 全量命令行参数
 
 # 下载
-Release版本：https://github.com/nilaoda/BBDown/releases
+GUI 安装包：https://github.com/Conanxy/BBDown/releases
+
+原版命令行 Release：https://github.com/nilaoda/BBDown/releases
 
 自动构建的测试版本：https://github.com/nilaoda/BBDown/actions
 
@@ -277,7 +282,7 @@ Commands:
 <summary>WEB/TV鉴权</summary>  
 
 ---
-  
+
 扫码登录网页账号：
 ```
 BBDown login
@@ -289,7 +294,7 @@ BBDown login
 BBDown logintv
 ```
 然后按照提示操作
- 
+
 *PS: 如果登录报错`The type initializer for 'Gdip' threw an exception`，请参考 [#37](https://github.com/nilaoda/BBDown/issues/37) 解决*
 
 手动加载网页cookie：
@@ -315,7 +320,7 @@ BBDown -tv -token "******" "https://www.bilibili.com/video/BV1qt4y1X7TW"
 在请求Header中寻找键为`authorization`的项，其值形为`identify_v1 5227************1`，其中的`5227************1`就是token(access_key)
 
 获取后手动通过`-token`命令加载, 或写入`BBDownApp.data`使程序自动读取.
-  
+
 ```
 BBDown -app -token "******" "https://www.bilibili.com/video/BV1qt4y1X7TW"
 ```
